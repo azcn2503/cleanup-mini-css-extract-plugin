@@ -1,0 +1,15 @@
+{
+  "name": "cleanup-mini-css-extract-plugin",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Aaron Cunnington <azcn2503@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/azcn2503/cleanup-mini-css-extract-plugin"
+  },
+  "peerDependencies": {
+    "mini-css-extract-plugin": "^0.9.0",
+    "webpack": "^4.41.4"
+  }
+}
