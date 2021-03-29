@@ -1,6 +1,6 @@
 {
   "name": "cleanup-mini-css-extract-plugin",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "index.js",
   "author": "Aaron Cunnington <azcn2503@gmail.com>",
   "license": "MIT",
