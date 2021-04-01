@@ -10,20 +10,30 @@ Add the plugin to your `webpack.config.js`:
 const CleanupMiniCssExtractPlugin = require("cleanup-mini-css-extract-plugin");
 
 module.exports = {
-  plugins: [
-    new CleanupMiniCssExtractPlugin({
-      // Remove all output from stats.compilation.children if set to true.
-      // This is where most of the log spam comes from.
-      // Default: true
-      children: true,
-
-      // Also remove warnings from stats.compilation.warnings if set to true.
-      // These may or may not be useful for you.
-      // Default: false
-      warnings: true
-    })
-  ];
+  plugins: [new CleanupMiniCssExtractPlugin()]
 };
 ```
 
 And breathe! 🍃
+
+## Configuration
+
+The default parameters are:
+
+```js
+new CleanupMiniCssExtractPlugin({
+  children: true,
+  warnings: false
+});
+```
+
+If either parameter is a function, this will filter the associated key and provide the filtered items in a callback. Here is an example:
+
+```js
+new CleanupMiniCssExtractPlugin({
+  children: removed => console.log(`removed ${removed.length} children`),
+  warnings: removed => console.log(`removed ${removed.length} warning(s)`)
+});
+```
+
+You could use this to log filtered items to a file, for example.

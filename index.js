@@ -1,9 +1,3 @@
-const filterChildren = child =>
-  child.name.indexOf("mini-css-extract-plugin") == -1;
-
-const filterWarnings = warning =>
-  warning.message.indexOf("[mini-css-extract-plugin]") == -1;
-
 const DEFAULT_OPTIONS = { children: true, warnings: false };
 
 const getOptionValue = (options, key) =>
@@ -19,15 +13,37 @@ class CleanupMiniCssExtractPlugin {
     compiler.hooks.done.tap("CleanupMiniCssExtractPlugin", stats => {
       if (this._children) {
         const children = stats.compilation.children;
+        const removedChildren = [];
         if (Array.isArray(children)) {
-          stats.compilation.children = children.filter(filterChildren);
+          stats.compilation.children = children.filter(child => {
+            if (child.name.indexOf("mini-css-extract-plugin") == -1) {
+              return true;
+            } else {
+              removedChildren.push(child);
+              return false;
+            }
+          });
+          if (typeof this._children === "function") {
+            this._children(removedChildren);
+          }
         }
       }
 
       if (this._warnings) {
         const warnings = stats.compilation.warnings;
+        const removedWarnings = [];
         if (Array.isArray(warnings)) {
-          stats.compilation.warnings = warnings.filter(filterWarnings);
+          stats.compilation.warnings = warnings.filter(warning => {
+            if (warning.message.indexOf("[mini-css-extract-plugin]") === -1) {
+              return true;
+            } else {
+              removedWarnings.push(warning);
+              return false;
+            }
+          });
+          if (typeof this._warnings === "function") {
+            this._warnings(removedWarnings);
+          }
         }
       }
     });
