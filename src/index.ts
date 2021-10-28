@@ -1,22 +1,35 @@
-const DEFAULT_OPTIONS = { children: true, warnings: false };
+import { Compiler, Stats, WebpackError } from "webpack";
 
-const getOptionValue = (options, key) =>
-  options[key] !== undefined ? options[key] : DEFAULT_OPTIONS[key];
+type TOption = boolean;
+type TRemovedChildren = Stats["compilation"][];
+type TRemovedWarnings = WebpackError[];
+type TRemovedChildrenCallback = (removedChildren: TRemovedChildren) => void;
+type TRemovedWarningsCallback = (removedWarnings: TRemovedWarnings) => void;
+
+type TOptions = {
+  children: TOption | TRemovedChildrenCallback;
+  warnings: TOption | TRemovedWarningsCallback;
+};
+
+const DEFAULT_OPTIONS: TOptions = { children: true, warnings: false };
 
 class CleanupMiniCssExtractPlugin {
+  private _children: TOptions["children"];
+  private _warnings: TOptions["warnings"];
+
   constructor(options = DEFAULT_OPTIONS) {
-    this._children = getOptionValue(options, "children");
-    this._warnings = getOptionValue(options, "warnings");
+    this._children = options.children || DEFAULT_OPTIONS.children;
+    this._warnings = options.warnings || DEFAULT_OPTIONS.warnings;
   }
 
-  apply(compiler) {
+  apply(compiler: Compiler) {
     compiler.hooks.done.tap("CleanupMiniCssExtractPlugin", stats => {
       if (this._children) {
         const children = stats.compilation.children;
-        const removedChildren = [];
+        const removedChildren: TRemovedChildren = [];
         if (Array.isArray(children)) {
           stats.compilation.children = children.filter(child => {
-            if (child.name.indexOf("mini-css-extract-plugin") == -1) {
+            if (child.name?.indexOf("mini-css-extract-plugin") == -1) {
               return true;
             } else {
               removedChildren.push(child);
@@ -31,7 +44,7 @@ class CleanupMiniCssExtractPlugin {
 
       if (this._warnings) {
         const warnings = stats.compilation.warnings;
-        const removedWarnings = [];
+        const removedWarnings: TRemovedWarnings = [];
         if (Array.isArray(warnings)) {
           stats.compilation.warnings = warnings.filter(warning => {
             if (warning.message.indexOf("[mini-css-extract-plugin]") === -1) {
